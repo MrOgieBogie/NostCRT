@@ -2,11 +2,20 @@
 
 # Purpose
 
-This repository is built from the Universal Blue Image Template for Nostalgia CRT OS 
+This repository is built from the Universal Blue Image Template for Nostalgia CRT OS, purposely built for the Lattepanda Delta 3 Single Board Computer. 
+
+- System:
+- [Lattepanda Delta 3] - https://www.lattepanda.com/lattepanda-3-delta
+  - Specs
+  - [Processor] - Intel® Celeron® N5105 - 2.0-2.9GHz Quad-Core, Four-Thread
+  - [Co-Processor] - ATMEGA32U4
+  - [Memory] - LPDDR4 8GB 2933MHz
+  - [Storage] - 64GB eMMC
+  - [Graphics] - Intel® UHD Graphics (Frequency: 450 – 800MHz)
 
 - Base images:
 - [main][(https://github.com/ublue-os/main/)]
-- Bazzite](https://bazzite.gg/
+- [Bazzite](https://bazzite.gg/)
 
 
 
