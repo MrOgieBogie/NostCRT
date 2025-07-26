@@ -19,6 +19,7 @@ env:
   IMAGE_NAME: "${{ github.event.repository.name }}"
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
   DEFAULT_TAG: "latest"
+  BUILD_STORAGE_PATH: ${{ github.workspace }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-${{ inputs.brand_name}}-${{ inputs.stream_name }}
@@ -40,13 +41,22 @@ jobs:
           echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
           echo "IMAGE_NAME=${IMAGE_NAME,,}" >> ${GITHUB_ENV}
 
-      - name: Ensure /mnt is mounted with increased size
+      - name: Ensure /mnt is mounted with increased size (if available)
         run: |
-          sudo mount -t tmpfs -o size=16G tmpfs /mnt || true
-          df -h /mnt || true
-
-      # If /mnt is not usable, switch all build storage references to /tmp or $GITHUB_WORKSPACE
-      # e.g., update scripts and Dockerfiles as needed
+          if [ -d /mnt ]; then
+            if ! mountpoint -q /mnt; then
+              echo "/mnt not mounted, mounting tmpfs"
+              sudo mount -t tmpfs -o size=16G tmpfs /mnt
+            else
+              echo "/mnt is already mounted"
+            fi
+            export BUILD_STORAGE_PATH="/mnt"
+          else
+            echo "/mnt not available, using workspace"
+            export BUILD_STORAGE_PATH="${GITHUB_WORKSPACE}"
+          fi
+          echo "BUILD_STORAGE_PATH=${BUILD_STORAGE_PATH}" >> $GITHUB_ENV
+          df -h $BUILD_STORAGE_PATH || true
 
       - name: Checkout
         uses: actions/checkout@v4
