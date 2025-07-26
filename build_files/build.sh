@@ -3,6 +3,18 @@
 set -ouex pipefail
 
 ### Install packages
+set -oue pipefail
+
+echo "Installing additional packages..."
+rpm-ostree install gamemode vulkan-tools htop nvtop power-profiles-daemon
+
+echo "Copying custom scripts..."
+install -D -m 0755 /ctx/firstboot/setup-intel-graphics.sh /usr/local/bin/setup-intel-graphics.sh
+install -D -m 0755 /ctx/firstboot/setup-user.sh /usr/local/bin/setup-user.sh
+
+echo "Running graphics optimisation script..."
+/usr/local/bin/setup-intel-graphics.sh
+/usr/local/bin/setup-user.sh
 
 # Packages can be installed from any enabled yum repo on the image.
 # RPMfusion repos are available by default in ublue main images
