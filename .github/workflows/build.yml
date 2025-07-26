@@ -41,21 +41,17 @@ jobs:
           echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
           echo "IMAGE_NAME=${IMAGE_NAME,,}" >> ${GITHUB_ENV}
 
-      - name: Ensure /mnt is mounted with increased size (if available)
+      - name: Set build storage path
         run: |
           if [ -d /mnt ]; then
             if ! mountpoint -q /mnt; then
               echo "/mnt not mounted, mounting tmpfs"
               sudo mount -t tmpfs -o size=16G tmpfs /mnt
-            else
-              echo "/mnt is already mounted"
             fi
-            export BUILD_STORAGE_PATH="/mnt"
+            echo "BUILD_STORAGE_PATH=/mnt" >> $GITHUB_ENV
           else
-            echo "/mnt not available, using workspace"
-            export BUILD_STORAGE_PATH="${GITHUB_WORKSPACE}"
+            echo "BUILD_STORAGE_PATH=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
           fi
-          echo "BUILD_STORAGE_PATH=${BUILD_STORAGE_PATH}" >> $GITHUB_ENV
           df -h $BUILD_STORAGE_PATH || true
 
       - name: Checkout
@@ -116,59 +112,5 @@ jobs:
           oci: false
 
       # Optional: Universal Blue Rechunk (uncomment if you use it)
-      # - name: Run Rechunker
-      #   id: rechunk
-      #   uses: hhd-dev/rechunk@v1.1.1
-      #   with:
-      #     rechunk: 'ghcr.io/hhd-dev/rechunk:v1.0.1'
-      #     ref: "localhost/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
-      #     prev-ref: "${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
-      #     skip_compression: true
-      #     version: ${{ env.CENTOS_VERSION }}
-      #     labels: ${{ steps.metadata.outputs.labels }}
-
-      # - name: Load in podman and tag
-      #   run: |
-      #     IMAGE=$(podman pull ${{ steps.rechunk.outputs.ref }})
-      #     sudo rm -rf ${{ steps.rechunk.outputs.output }}
-      #     for tag in ${{ steps.metadata.outputs.tags }}; do
-      #       podman tag $IMAGE ${{ env.IMAGE_NAME }}:$tag
-      #     done
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push To GHCR
-        uses: redhat-actions/push-to-registry@v2
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        id: push
-        env:
-          REGISTRY_USER: ${{ github.actor }}
-          REGISTRY_PASSWORD: ${{ github.token }}
-        with:
-          registry: ${{ env.IMAGE_REGISTRY }}
-          image: ${{ env.IMAGE_NAME }}
-          tags: ${{ steps.metadata.outputs.tags }}
-          username: ${{ env.REGISTRY_USER }}
-          password: ${{ env.REGISTRY_PASSWORD }}
-
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@v3.9.1
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-
-      - name: Sign container image
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        run: |
-          IMAGE_FULL="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
-          for tag in ${{ steps.metadata.outputs.tags }}; do
-            cosign sign -y --key env://COSIGN_PRIVATE_KEY $IMAGE_FULL:$tag
-          done
-        env:
-          TAGS: ${{ steps.push.outputs.digest }}
-          COSIGN_EXPERIMENTAL: false
-          COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
+     ](#)
+
