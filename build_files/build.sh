@@ -2,16 +2,15 @@
 
 set -ouex pipefail
 
-# Check that /mnt is mounted and has enough space
-if ! mountpoint -q /mnt; then
-  echo "/mnt is not mounted. Aborting build."
-  exit 1
-fi
-
-AVAILABLE=$(df --output=avail /mnt | tail -n1)
-if [ "$AVAILABLE" -lt 1048576 ]; then # ~1GB in KB
-  echo "Not enough space on /mnt. Available: $AVAILABLE KB"
-  exit 1
+# Check that /mnt is mounted and has enough space, or skip if not mounted
+if mountpoint -q /mnt; then
+  AVAILABLE=$(df --output=avail /mnt | tail -n1)
+  if [ "$AVAILABLE" -lt 1048576 ]; then # ~1GB in KB
+    echo "Not enough space on /mnt. Available: $AVAILABLE KB"
+    exit 1
+  fi
+else
+  echo "/mnt is not mounted. Skipping /mnt checks."
 fi
 
 ### Install packages
