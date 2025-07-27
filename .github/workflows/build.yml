@@ -48,6 +48,12 @@ jobs:
           fi
           echo "BUILD_STORAGE_PATH=/mnt" >> $GITHUB_ENV
 
+      - name: Verify /mnt mount
+        run: |
+          echo "Checking /mnt mount status..."
+          mount | grep '/mnt'
+          df -h /mnt
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
