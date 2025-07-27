@@ -16,14 +16,17 @@ fi
 ### Install packages
 set -oue pipefail
 
-echo "Copying custom scripts..."
+echo "Copying firstboot scripts..."
 mkdir -p /var/firstboot
-install -m 0755 /ctx/firstboot/setup-intel-graphics.sh var/firstboot/setup-intel-graphics.sh
-install -m 0755 /ctx/firstboot/setup-user.sh var/firstboot/setup-user.sh
+install -m 0755 /ctx/firstboot/setup-intel-graphics.sh /var/firstboot/setup-intel-graphics.sh
+install -m 0755 /ctx/firstboot/setup-user.sh /var/firstboot/setup-user.sh
 
-echo "Running graphics optimisation script..."
-/usr/local/bin/setup-intel-graphics.sh
-/usr/local/bin/setup-user.sh
+echo "Installing firstboot systemd service and runner..."
+install -m 0755 /ctx/firstboot/firstboot.sh /usr/local/bin/firstboot.sh
+install -m 0644 /ctx/firstboot/firstboot-setup.service /etc/systemd/system/firstboot-setup.service
+
+echo "Enabling firstboot service..."
+systemctl enable firstboot-setup.service
 
 dnf5 install -y tmux 
 
