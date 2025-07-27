@@ -17,8 +17,9 @@ fi
 set -oue pipefail
 
 echo "Copying custom scripts..."
-install -m 0755 /ctx/firstboot/setup-intel-graphics.sh /usr/local/bin/setup-intel-graphics.sh
-install -m 0755 /ctx/firstboot/setup-user.sh /usr/local/bin/setup-user.sh
+mkdir -p /var/firstboot
+install -m 0755 /ctx/firstboot/setup-intel-graphics.sh var/firstboot/setup-intel-graphics.sh
+install -m 0755 /ctx/firstboot/setup-user.sh var/firstboot/setup-user.sh
 
 echo "Running graphics optimisation script..."
 /usr/local/bin/setup-intel-graphics.sh
