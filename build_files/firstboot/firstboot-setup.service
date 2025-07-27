@@ -1,0 +1,11 @@
+[Unit]
+Description=First boot setup script
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/firstboot.sh
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
