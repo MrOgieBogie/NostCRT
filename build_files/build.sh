@@ -3,7 +3,7 @@
 set -ouex pipefail
 
 # Check that /mnt is mounted and has enough space
-if ! mount | grep -q 'on /mnt '; then
+if ! mountpoint -q /mnt; then
   echo "/mnt is not mounted. Aborting build."
   exit 1
 fi
