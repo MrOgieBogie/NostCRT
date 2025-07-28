@@ -22,7 +22,10 @@ install -m 0755 /ctx/firstboot/setup-intel-graphics.sh /var/firstboot/setup-inte
 install -m 0755 /ctx/firstboot/setup-user.sh /var/firstboot/setup-user.sh
 
 echo "Installing firstboot systemd service and runner..."
+mkdir -p /usr/local/bin
 install -m 0755 /ctx/firstboot/firstboot.sh /usr/local/bin/firstboot.sh
+
+mkdir -p /etc/systemd/system
 install -m 0644 /ctx/firstboot/firstboot-setup.service /etc/systemd/system/firstboot-setup.service
 
 echo "Enabling firstboot service..."
