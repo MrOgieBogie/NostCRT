@@ -53,7 +53,7 @@ jobs:
           df -h /mnt
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Uncomment if you need extra space
       # - name: Maximize build space
